@@ -29,16 +29,11 @@ RUN apt-get update && \
     apt-get -y autoremove && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /tmp/*
-ADD install_xrootd.sh install_xrootd.sh
-RUN bash install_xrootd.sh && \
-    rm install_xrootd.sh
-ENV PATH /opt/xrootd/bin:${PATH}
-ENV LD_LIBRARY_PATH /opt/xrootd/lib
 
 RUN conda install -c pyg -c conda-forge uproot xrootd scikit-learn matplotlib tqdm pyg autopep8
 
 RUN pip install --no-cache-dir mplhep \
     && pip install --no-cache-dir -U jupyter-book
-    
+
 # Override command to disable running jupyter notebook at launch
 # CMD ["/bin/bash"]

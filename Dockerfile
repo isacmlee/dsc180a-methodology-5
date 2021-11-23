@@ -19,14 +19,26 @@ LABEL maintainer="UC San Diego ITS/ETS <ets-consult@ucsd.edu>"
 # 2) change to root to install packages
 USER root
 
-RUN apt-get -y install htop
+# Install cmake and XRootD
+RUN apt-get update && \
+    apt-get upgrade -qq -y && \
+    apt-get install -qq -y \
+    python3-pip \
+    cmake && \
+    apt-get -y autoclean && \
+    apt-get -y autoremove && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /tmp/*
+ADD install_xrootd.sh install_xrootd.sh
+RUN bash install_xrootd.sh && \
+    rm install_xrootd.sh
+ENV PATH /opt/xrootd/bin:${PATH}
+ENV LD_LIBRARY_PATH /opt/xrootd/lib
 
-# 3) install packages using notebook user
-USER jovyan
+RUN conda install -c pyg -c conda-forge uproot xrootd scikit-learn matplotlib tqdm pyg autopep8
 
-# RUN conda install -y scikit-learn
-
-RUN pip install --no-cache-dir networkx scipy
-
+RUN pip install --no-cache-dir mplhep \
+    && pip install --no-cache-dir -U jupyter-book
+    
 # Override command to disable running jupyter notebook at launch
 # CMD ["/bin/bash"]
